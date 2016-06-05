@@ -34,24 +34,32 @@ if __name__ == "__main__":
         sys.exit(-1)
     logging.info("Parser setup")
 
-    #conf = SparkConf().setMaster("local").setAppName("IISLogAnalysis")
-    #sc = SparkContext(conf=conf)
+    conf = SparkConf()\
+        .setMaster("local")\
+        .setAppName("IISLogAnalysis")\
+        .set("spark.executor.memory", "1g")
+    sc = SparkContext(conf=conf)
 
-    sc = SparkContext("local", appName="IISLogAnalysis")
     logging.info("Launching Spark Context")
 
+    # Loading file as RDD
     lines = sc.textFile("file:///sparkIISLog/u_nc160601.log.txt")
+    #lines = sc.textFile("file:///sparkIISLog/test.txt")
 
-    rdd = lines.map(ParseLog.parseIISLogLine).cache()
+    # Parse Log lines
+    parsed_logs = lines.map(ParseLog.parseIISLogLine).cache()
 
-    content_sizes = rdd.map(lambda log: log.content_size).cache()
+    # Keeping only successfully parsed log lines
+    access_logs = (parsed_logs
+                   .filter(lambda s: s[1] == 1)
+                   .map(lambda s: s[0])
+                   .cache())
+
+    content_sizes = access_logs.map(lambda log: log.content_size).cache()
+
     print("Content Size Avg: {0}, Min: {1}, Max: {2}".format(
-        rdd.reduce(lambda a, b: a + b)/content_sizes.count(),
-        rdd.min(),
-        rdd.max()))
-
-    ######
-
-    #Test
+        content_sizes.reduce(lambda a, b: a + b)/content_sizes.count(),
+        content_sizes.min(),
+        content_sizes.max()))
 
     logging.info("Terminating execution")

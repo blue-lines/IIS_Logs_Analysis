@@ -29,7 +29,7 @@ def parseIISLogLine(logline):
     """
     Parse IIS log lines
     :param logline: log line in string format
-    :return: Row object for RDD
+    :return:
     """
 
     match = re.search(IIS_LOG_PATTERN, logline)
@@ -40,15 +40,15 @@ def parseIISLogLine(logline):
         size = int(0)
     else:
         size = int(match.group(9))
-    host = match.group(1)
-    client_identd = match.group(2)
-    user_id = match.group(3)
-    date_time = parse_IIS_time(match.group(4))
-    method = match.group(5)
-    endpoint = match.group(6)
-    protocol = match.group(7)
-    response_code = int(match.group(8))
-    content_size = size
+    #host = match.group(1)
+    #client_identd = match.group(2)
+    #user_id = match.group(3)
+    #date_time = parse_IIS_time(match.group(4))
+    #method = match.group(5)
+    #endpoint = match.group(6)
+    #protocol = match.group(7)
+    #response_code = int(match.group(8))
+    #content_size = size
 
     #return(host, client_identd, user_id, date_time, method, endpoint, protocol, response_code, content_size)
 
@@ -62,4 +62,4 @@ def parseIISLogLine(logline):
         protocol=match.group(7),
         response_code=int(match.group(8)),
         content_size=size
-    ))
+    ), 1)
